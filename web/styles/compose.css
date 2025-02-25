@@ -1105,10 +1105,16 @@ textarea.new_message_textarea {
     color: var(--color-compose-recipient-box-text-color);
     background-color: var(--color-compose-recipient-box-background-color);
     border-color: var(--color-compose-recipient-box-border-color);
+    max-width: 30vw;
 
     &.dropdown-widget-button {
         padding: 0 6px;
         border-radius: 4px;
+    }
+
+    .dropdown_widget_value {
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
 }
 
@@ -1174,8 +1180,8 @@ textarea.new_message_textarea {
 
     .zulip-icon-send {
         display: block;
-        font-size: 17px;
-        line-height: 16px;
+        font-size: 1.2143em; /* 17px at 14px/em */
+        line-height: 0.9412; /* 16px at 17px/em */
     }
 
     .loader {

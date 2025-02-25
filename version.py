@@ -34,7 +34,7 @@ DESKTOP_WARNING_VERSION = "5.9.3"
 # new level means in api_docs/changelog.md, as well as "**Changes**"
 # entries in the endpoint's documentation in `zulip.yaml`.
 
-API_FEATURE_LEVEL = 355  # Last bumped for adding 'ignored_because_not_subscribed_channels'
+API_FEATURE_LEVEL = 356  # Last bumped for adding `include_can_access_content` to get-streams.
 
 # Bump the minor PROVISION_VERSION to indicate that folks should provision
 # only when going from an old version of the code to a newer version. Bump
@@ -49,4 +49,4 @@ API_FEATURE_LEVEL = 355  # Last bumped for adding 'ignored_because_not_subscribe
 #   historical commits sharing the same major version, in which case a
 #   minor version bump suffices.
 
-PROVISION_VERSION = (316, 0)  # bumped 2025-02-21 to upgrade tusd
+PROVISION_VERSION = (317, 0)  # bumped 2025-02-24 to migrate to uv

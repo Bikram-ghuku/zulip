@@ -1441,10 +1441,11 @@ def get_streams_for_user(
     include_web_public: bool = False,
     include_subscribed: bool = True,
     exclude_archived: bool = True,
-    include_all_active: bool = False,
+    include_all: bool = False,
     include_owner_subscribed: bool = False,
+    include_can_access_content: bool = False,
 ) -> list[Stream]:
-    if include_all_active and not user_profile.is_realm_admin:
+    if include_all and not user_profile.is_realm_admin:
         raise JsonableError(_("User not authorized for this query"))
 
     include_public = include_public and user_profile.can_access_public_streams()
@@ -1457,7 +1458,7 @@ def get_streams_for_user(
     if exclude_archived:
         query = query.filter(deactivated=False)
 
-    if include_all_active:
+    if include_all:
         streams = query.only(
             *Stream.API_FIELDS, "can_send_message_group", "can_send_message_group__named_user_group"
         )
@@ -1473,14 +1474,53 @@ def get_streams_for_user(
             else:
                 query_filter |= option
 
-        if include_subscribed:
+        should_add_owner_subscribed_filter = include_owner_subscribed and user_profile.is_bot
+
+        if include_can_access_content:
+            all_streams = list(
+                query.only(
+                    *Stream.API_FIELDS,
+                    "can_send_message_group",
+                    "can_send_message_group__named_user_group",
+                    # Both of these fields are need for get_content_access_streams.
+                    "is_in_zephyr_realm",
+                    "recipient_id",
+                )
+            )
+            user_group_membership_details = UserGroupMembershipDetails(
+                user_recursive_group_ids=None
+            )
+            content_access_streams = get_content_access_streams(
+                user_profile, all_streams, user_group_membership_details
+            )
+            # Optimization: Currently, only include_owner_subscribed
+            # has the ability to add additional results to
+            # content_access_streams. We return early to save us a
+            # database query down the line if we do not need to add
+            # include_owner_subscribed filter.
+            if not should_add_owner_subscribed_filter:
+                return content_access_streams
+
+            content_access_stream_ids = [stream.id for stream in content_access_streams]
+            content_access_stream_check = Q(id__in=set(content_access_stream_ids))
+            add_filter_option(content_access_stream_check)
+
+        # Subscribed channels will already have been included if
+        # include_can_access_content is True.
+        if not include_can_access_content and include_subscribed:
             subscribed_stream_ids = get_subscribed_stream_ids_for_user(user_profile)
             recipient_check = Q(id__in=set(subscribed_stream_ids))
             add_filter_option(recipient_check)
-        if include_public:
+
+        # All accessible public channels will already have been
+        # included if include_can_access_content is True.
+        if not include_can_access_content and include_public:
             invite_only_check = Q(invite_only=False)
             add_filter_option(invite_only_check)
-        if include_web_public:
+
+        # All accessible web-public channels will already have been
+        # included if include_can_access_content is True.
+        if not include_can_access_content and include_web_public:
             # This should match get_web_public_streams_queryset
             web_public_check = Q(
                 is_web_public=True,
@@ -1489,7 +1529,8 @@ def get_streams_for_user(
                 deactivated=False,
             )
             add_filter_option(web_public_check)
-        if include_owner_subscribed and user_profile.is_bot:
+
+        if should_add_owner_subscribed_filter:
             bot_owner = user_profile.bot_owner
             assert bot_owner is not None
             owner_stream_ids = get_subscribed_stream_ids_for_user(bot_owner)
@@ -1573,9 +1614,10 @@ def do_get_streams(
     include_web_public: bool = False,
     include_subscribed: bool = True,
     exclude_archived: bool = True,
-    include_all_active: bool = False,
+    include_all: bool = False,
     include_default: bool = False,
     include_owner_subscribed: bool = False,
+    include_can_access_content: bool = False,
 ) -> list[APIStreamDict]:
     # This function is only used by API clients now.
 
@@ -1585,8 +1627,9 @@ def do_get_streams(
         include_web_public,
         include_subscribed,
         exclude_archived,
-        include_all_active,
+        include_all,
         include_owner_subscribed,
+        include_can_access_content,
     )
 
     stream_ids = {stream.id for stream in streams}
