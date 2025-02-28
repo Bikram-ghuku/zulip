@@ -22,13 +22,16 @@ Channel links are automatically formatted as [#channel name]().
 
 !!! tip ""
 
-    You can create a channel link manually by typing `#**channel name**`.
+    To link to the channel you're composing to, type `#>`, and pick the
+    top option from the autocomplete.
 
 {end_tabs}
 
 When you paste a channel link into Zulip, it's automatically formatted as
 `#**channel name**`. You can paste as plain text if you prefer with <kbd
 data-mac-following-key="⌥">Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>V</kbd>.
+
+You can create a channel link manually by typing `#**channel name**`
 
 ## Link to a topic within Zulip
 
@@ -48,13 +51,17 @@ Topic links are automatically formatted as [#channel > topic]().
 
 !!! tip ""
 
-    You can create a topic link manually by typing `#**channel name>topic name**`.
+    To link to a topic in the channel you're composing to, type `#>`
+    followed by a few letters from the topic name, and pick the desired
+    topic from the autocomplete.
 
 {end_tabs}
 
 When you paste a topic link into Zulip, it's automatically formatted as
 `#**channel name>topic name**`. You can paste as plain text if you prefer with
 <kbd data-mac-following-key="⌥">Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>V</kbd>.
+
+You can create a topic link manually by typing `#**channel name>topic name**`.
 
 ## Link to Zulip from anywhere
 
@@ -89,6 +96,10 @@ In addition, links to messages, topics, and channels are **permanent**:
   channel is [renamed](/help/rename-a-channel) or
   [archived](/help/archive-a-channel).
 
+When you copy a Zulip link and paste it anywhere that accepts HTML
+formatting (e.g., your email, GitHub, docs, etc.), the link will be
+formatted as it would be in Zulip (e.g., [#channel > topic](/)).
+
 ### Get a link to a specific message
 
 This copies to your clipboard a permanent link to the message, displayed in the
@@ -102,8 +113,7 @@ formatted to be easy to read:
 #**channel name>topic name@message ID**
 ```
 
-When you send your message, the link will appear as **#channel name>topic
-name@💬**.
+When you send your message, the link will appear as [#channel > topic @ 💬](/).
 
 {start_tabs}
 
@@ -118,13 +128,11 @@ name@💬**.
     If using Zulip in a browser, you can also click on the timestamp
     of a message, and copy the URL from your browser's address bar.
 
-!!! tip ""
-
-    When you paste a message link into Zulip, it is automatically
-    formatted for you. You can paste as plain text if you prefer with
-    <kbd data-mac-following-key="⌥">Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>V</kbd>.
-
 {end_tabs}
+
+When you paste a message link into Zulip, it is automatically
+formatted for you. You can paste as plain text if you prefer with
+<kbd data-mac-following-key="⌥">Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>V</kbd>.
 
 ### Get a link to a specific topic
 

@@ -20,6 +20,54 @@ format used by the Zulip server that they are interacting with.
 
 ## Changes in Zulip 10.0
 
+**Feature level 360**
+
+* [`GET /messages/{message_id}`](/api/get-message), [`GET
+  /messages/{message_id}/read_receipts`](/api/get-read-receipts):
+  Messages from an archived channels can now be read through these API
+  endpoints, if the channel's access control permissions permit doing
+  so.
+
+**Feature level 359**
+
+* `PATCH /bots/{bot_user_id}`: Previously, changing the owner of a bot
+  unsubscribed the bot from any channels that the new owner was not
+  subscribed to. This behavior was removed in favor of documenting the
+  security trade-off associated with giving bots read access to
+  sensitive channel content.
+
+**Feature level 358**
+
+* `PATCH /realm`, [`GET /events`](/api/get-events): Changed `allow_edit_history`
+  boolean field to `message_edit_history_visibility_policy` integer field to
+  support an intermediate field for `Moves only` edit history of messages.
+* [`POST /register`](/api/register-queue): `realm_allow_edit_history` field is
+  deprecated and has been replaced by `realm_message_edit_history_visibility_policy`.
+  The value of `realm_allow_edit_history` is set to `False` if
+  `realm_message_edit_history_visibility_policy` is configured as "None",
+  and `True` for "Moves only" or "All" message edit history.
+
+**Feature level 357**
+
+* [`GET /users/me/subscriptions`](/api/get-subscriptions),
+  [`GET /streams`](/api/get-streams), [`GET /events`](/api/get-events),
+  [`POST /register`](/api/register-queue): Added `can_subscribe_group`
+  field to Stream and Subscription objects.
+* [`POST /users/me/subscriptions`](/api/subscribe),
+  [`PATCH /streams/{stream_id}`](/api/update-stream): Added
+  `can_subscribe_group` parameter to support setting and changing the
+  user group whose members can subscribe to the specified stream.
+
+**Feature level 356**
+
+* [`GET /streams`](/api/get-streams): The new parameter
+  `include_can_access_content`, if set to True, returns all the
+  channels that the user making the request has content access to.
+* [`GET /streams`](/api/get-streams): Rename `include_all_active` to
+  `include_all` since the separate `exclude_archived` parameter is
+  what controls whether to include archived channels. The
+  `include_all` parameter is now supported for non-administrators.
+
 **Feature level 355**
 
 * [`POST /messages/flags/narrow`](/api/update-message-flags-for-narrow),

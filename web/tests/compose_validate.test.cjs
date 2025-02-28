@@ -165,7 +165,7 @@ function initialize_pm_pill(mock_template) {
     $("#private_message_recipient").before = noop;
 
     compose_pm_pill.initialize({
-        on_pill_create_or_remove: compose_recipient.update_placeholder_text,
+        on_pill_create_or_remove: compose_recipient.update_compose_area_placeholder_text,
     });
 
     $("#zephyr-mirror-error").is = noop;
@@ -186,6 +186,8 @@ test_ui("validate_stream_message_address_info", ({mock_template}) => {
         stream_id: 101,
         name: "party",
         subscribed: true,
+        can_add_subscribers_group: nobody.id,
+        can_subscribe_group: nobody.id,
     };
     stream_data.add_sub(party_sub);
     assert.ok(compose_validate.validate_stream_message_address_info(party_sub));
@@ -714,6 +716,7 @@ test_ui("warn_if_mentioning_unsubscribed_user", ({override, mock_template}) => {
         name: "random",
         can_add_subscribers_group: admin.id,
         can_administer_channel_group: admin.id,
+        can_subscribe_group: admin.id,
     };
     stream_data.add_sub(sub);
     compose_state.set_stream_id(sub.stream_id);

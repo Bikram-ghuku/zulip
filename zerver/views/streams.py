@@ -86,7 +86,7 @@ from zerver.lib.topic import (
 )
 from zerver.lib.typed_endpoint import ApiParamConfig, PathOnly, typed_endpoint
 from zerver.lib.typed_endpoint_validators import check_color
-from zerver.lib.types import AnonymousSettingGroupDict
+from zerver.lib.types import UserGroupMembersDict
 from zerver.lib.user_groups import (
     GroupSettingChangeRequest,
     UserGroupMembershipDetails,
@@ -271,6 +271,7 @@ def update_stream_backend(
     can_administer_channel_group: Json[GroupSettingChangeRequest] | None = None,
     can_send_message_group: Json[GroupSettingChangeRequest] | None = None,
     can_remove_subscribers_group: Json[GroupSettingChangeRequest] | None = None,
+    can_subscribe_group: Json[GroupSettingChangeRequest] | None = None,
 ) -> HttpResponse:
     # Most settings updates only require metadata access, not content
     # access. We will check for content access further when and where
@@ -598,10 +599,11 @@ def add_subscriptions_backend(
     is_default_stream: Json[bool] = False,
     history_public_to_subscribers: Json[bool] | None = None,
     message_retention_days: Json[str] | Json[int] = RETENTION_DEFAULT,
-    can_add_subscribers_group: Json[int | AnonymousSettingGroupDict] | None = None,
-    can_administer_channel_group: Json[int | AnonymousSettingGroupDict] | None = None,
-    can_send_message_group: Json[int | AnonymousSettingGroupDict] | None = None,
-    can_remove_subscribers_group: Json[int | AnonymousSettingGroupDict] | None = None,
+    can_add_subscribers_group: Json[int | UserGroupMembersDict] | None = None,
+    can_administer_channel_group: Json[int | UserGroupMembersDict] | None = None,
+    can_send_message_group: Json[int | UserGroupMembersDict] | None = None,
+    can_remove_subscribers_group: Json[int | UserGroupMembersDict] | None = None,
+    can_subscribe_group: Json[int | UserGroupMembersDict] | None = None,
     announce: Json[bool] = False,
     principals: Json[list[str] | list[int]] | None = None,
     authorization_errors_fatal: Json[bool] = True,
@@ -644,8 +646,8 @@ def add_subscriptions_backend(
             if permission_configuration.default_group_name == "stream_creator_or_nobody":
                 # Default for some settings like "can_administer_channel_group"
                 # is anonymous group with stream creator.
-                setting_groups_dict[group_settings_map[setting_name].id] = (
-                    AnonymousSettingGroupDict(direct_subgroups=[], direct_members=[user_profile.id])
+                setting_groups_dict[group_settings_map[setting_name].id] = UserGroupMembersDict(
+                    direct_subgroups=[], direct_members=[user_profile.id]
                 )
             else:
                 setting_groups_dict[group_settings_map[setting_name].id] = group_settings_map[
@@ -681,6 +683,7 @@ def add_subscriptions_backend(
         stream_dict_copy["can_remove_subscribers_group"] = group_settings_map[
             "can_remove_subscribers_group"
         ]
+        stream_dict_copy["can_subscribe_group"] = group_settings_map["can_subscribe_group"]
 
         stream_dicts.append(stream_dict_copy)
 
@@ -925,19 +928,24 @@ def get_streams_backend(
     include_web_public: Json[bool] = False,
     include_subscribed: Json[bool] = True,
     exclude_archived: Json[bool] = True,
+    include_all: Json[bool] = False,
     include_all_active: Json[bool] = False,
     include_default: Json[bool] = False,
     include_owner_subscribed: Json[bool] = False,
+    include_can_access_content: Json[bool] = False,
 ) -> HttpResponse:
+    if include_all_active is True:
+        include_all = True
     streams = do_get_streams(
         user_profile,
         include_public=include_public,
         include_web_public=include_web_public,
         include_subscribed=include_subscribed,
         exclude_archived=exclude_archived,
-        include_all_active=include_all_active,
+        include_all=include_all,
         include_default=include_default,
         include_owner_subscribed=include_owner_subscribed,
+        include_can_access_content=include_can_access_content,
     )
     return json_success(request, data={"streams": streams})
 

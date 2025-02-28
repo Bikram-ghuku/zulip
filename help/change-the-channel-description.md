@@ -1,7 +1,5 @@
 # Change a channel's description
 
-{!admin-only.md!}
-
 Channel descriptions can be used to explain the purpose of a channel, and link
 to usage guidelines, resources, or related channels. They appear in the
 navigation bar at the top of the web and desktop apps when you view the channel.
@@ -51,6 +49,7 @@ disabled. Use Markdown formatting to include a link to a website, Zulip
 
 ## Related articles
 
+* [View channel information](/help/view-channel-information)
 * [Rename a channel](/help/rename-a-channel)
 * [Markdown formatting][markdown-formatting]
 * [Channel permissions](/help/channel-permissions)

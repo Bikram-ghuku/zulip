@@ -1028,7 +1028,15 @@ textarea.new_message_textarea {
 
 #compose_recipient_box {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    /* When displaying #topic-not-mandatory-placeholder,
+       we let it occupy the entire topic box. Otherwise,
+       we set and preserve named areas for the ordinary
+       topic text and the clear-topic button. */
+    grid-template-columns:
+        [topic-box-start topic-start] minmax(0, 1fr)
+        [topic-end topic-clear-button-start] auto [topic-clear-button-end topic-box-end];
+    grid-template-rows: auto;
+    align-content: center;
     align-items: stretch;
     flex: 1 1 0;
     border: 1px solid var(--color-compose-recipient-box-border-color);
@@ -1051,6 +1059,8 @@ textarea.new_message_textarea {
 
     /* Styles for input in the recipient_box */
     #stream_message_recipient_topic {
+        grid-area: topic;
+        color: var(--color-compose-recipient-box-text-color);
         /* Override grid's effective `max-content` min-width */
         overflow: hidden;
         text-overflow: ellipsis;
@@ -1061,10 +1071,26 @@ textarea.new_message_textarea {
         padding: 4px 6px;
         /* Reset height to let `align-items: stretch` on the grid parent handle this. */
         height: auto;
+
+        &.empty-topic-display::placeholder {
+            color: var(--color-compose-recipient-box-text-color);
+        }
+    }
+
+    #topic-not-mandatory-placeholder {
+        grid-area: topic-box;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        padding: 5px 6px;
+        display: none;
+        visibility: hidden;
+        pointer-events: none;
     }
 
     /* Styles for new conversation button in the recipient_box */
     #recipient_box_clear_topic_button {
+        grid-area: topic-clear-button;
         /* Set the border radius smaller, relative to the parent */
         border-radius: 2px;
         padding: 6px;
@@ -1087,8 +1113,8 @@ textarea.new_message_textarea {
         }
     }
 
-    #stream_message_recipient_topic:placeholder-shown
-        + #recipient_box_clear_topic_button {
+    #stream_message_recipient_topic:not(.empty-topic-display):placeholder-shown
+        ~ #recipient_box_clear_topic_button {
         visibility: hidden;
     }
     /* This will reset the bootstrap margin-bottom: 10px value for the inputs */
@@ -1105,10 +1131,16 @@ textarea.new_message_textarea {
     color: var(--color-compose-recipient-box-text-color);
     background-color: var(--color-compose-recipient-box-background-color);
     border-color: var(--color-compose-recipient-box-border-color);
+    max-width: 30vw;
 
     &.dropdown-widget-button {
         padding: 0 6px;
         border-radius: 4px;
+    }
+
+    .dropdown_widget_value {
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
 }
 
@@ -1174,8 +1206,8 @@ textarea.new_message_textarea {
 
     .zulip-icon-send {
         display: block;
-        font-size: 17px;
-        line-height: 16px;
+        font-size: 1.2143em; /* 17px at 14px/em */
+        line-height: 0.9412; /* 16px at 17px/em */
     }
 
     .loader {
